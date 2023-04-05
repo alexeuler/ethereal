@@ -1,0 +1,5 @@
+rpc:
+  endpoints: ${WEB3_PROVIDER_URI}
+  max_fails: 3
+  max_fails_period_secs: 1800
+  timeout: 20
