@@ -3,7 +3,7 @@ import json
 from functools import cached_property, cache
 import os
 from datetime import datetime
-from .base import Base
+from base import Base
 
 
 class CacheException(Exception):
@@ -21,9 +21,12 @@ class Cache(Base):
         super().__init__(*args, **kwargs)
         self._config = config
 
+    @cache
     def load_json(self, key: str) -> Dict[str, Any]:
-        with open(self._path(key), "r") as f:
-            return json.load(f)
+        return json.loads(self.load(key))
+
+    def save_json(self, key: str, data: Dict[str, Any]):
+        self.save(key, json.dumps(data, indent=2))
 
     @cache
     def load(self, key: str) -> str:
@@ -31,6 +34,7 @@ class Cache(Base):
             return f.read()
 
     def save(self, key: str, data: str):
+        del self.load_json[key]
         del self.load[key]
         path = self._path(key)
         os.makedirs(path, exist_ok=True)
@@ -43,17 +47,16 @@ class Cache(Base):
 
 
 class JsonDataCache(Base):
-    _cache_folder: str
+    _cache: Cache
 
-    def __init__(self, cache_folder: str, *args, **kwargs):
+    def __init__(self, cache: Cache, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._cache_folder = cache_folder
+        self._cache = cache
 
     @cached_property
     def data(self) -> Dict[str, Any] | List[Any]:
         try:
-            with open(self._path(), "r") as f:
-                return json.load(f)
+            return self._cache.load_json(self._key)
         except Exception as e:
             pass
         res = self.save()
