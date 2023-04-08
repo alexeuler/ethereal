@@ -35,7 +35,7 @@ class Etherscan(Base):
     _config: EtherscanConfig
     _default_chain_id: int
 
-    def __init__(self, config: str, *args, **kwargs):
+    def __init__(self, config: EtherscanConfig, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._config = config
         self._default_chain_id = int(config["default_chain_id"])

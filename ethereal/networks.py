@@ -1,3 +1,7 @@
+from web3.providers import BaseProvider, HTTPProvider, IPCProvider, WebsocketProvider
+from urllib.parse import urlparse
+from eth_typing import URI
+
 CHAIN_IDS_INDEX = {
     1: "mainnet",
     3: "ropsten",
@@ -12,6 +16,24 @@ CHAIN_IDS_INDEX = {
 }
 
 NETWORKS_INDEX = {v: k for k, v in CHAIN_IDS_INDEX.items()}
+
+
+def load_provider_from_uri(uri_string: URI, timeout=10) -> BaseProvider:
+    """
+    Loads a Web3 provider from a URI string
+    """
+    uri = urlparse(uri_string)
+    if uri.scheme == "file":
+        return IPCProvider(uri.path)
+    elif uri.scheme in ["http", "https"]:
+        return HTTPProvider(uri_string, request_kwargs={"timeout": timeout})
+    elif uri.scheme in ["ws", "wss"]:
+        return WebsocketProvider(uri_string, websocket_timeout=timeout)
+    else:
+        raise NotImplementedError(
+            "Web3 does not know how to connect to scheme "
+            f"{uri.scheme!r} in {uri_string!r}"
+        )
 
 
 def get_chain_id(network: str) -> int:
