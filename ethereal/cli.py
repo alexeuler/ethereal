@@ -1,9 +1,7 @@
 import os
 import click
-from typing import List
-from containers import AppContainer
-from dependency_injector.wiring import Provide, inject
-from etherscan import Etherscan
+from web3 import Web3
+from dependency_injector.wiring import inject
 from networks import load_provider_from_uri
 from app import Ethereal
 
@@ -12,16 +10,6 @@ web3: Ethereal = None
 
 
 @click.group()
-@click.option(
-    "-c",
-    "--chain",
-    type=click.Choice(
-        ["mainnet", "polygon", "avalanche", "ftm", "arbitrum", "optimism"],
-        case_sensitive=False,
-    ),
-    default="mainnet",
-    help="Chain to use",
-)
 @click.option(
     "-ll",
     "--log-level",
@@ -38,9 +26,9 @@ web3: Ethereal = None
     default=lambda: os.environ.get("WEB3_PROVIDER_URI", "http://localhost:8545"),
     help="RPC endpoint to use",
 )
-def cli(chain: str | None, log_level: str | None, rpc: str | None):
+def cli(log_level: str | None, rpc: str | None):
     global web3
-    web3 = Ethereal(load_provider_from_uri(rpc), chain, log_level)
+    web3 = Ethereal(Web3(load_provider_from_uri(rpc)), log_level)
 
 
 @cli.command()
