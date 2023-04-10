@@ -2,8 +2,9 @@ import os
 import click
 from web3 import Web3
 from dependency_injector.wiring import inject
-from networks import load_provider_from_uri
-from app import Ethereal
+from ethereal.networks import load_provider_from_uri
+from ethereal.app import Ethereal
+
 
 current_folder = os.path.realpath(os.path.dirname(__file__))
 web3: Ethereal = None

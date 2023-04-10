@@ -1,5 +1,5 @@
 cache:
-  root: ${ETHEREAL_CACHE_ROOT}
+  root: ${ETHEREAL_CACHE_ROOT:./.ethereal_cache}
 
 etherscan:
   default_chain_id: 1

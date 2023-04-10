@@ -1,7 +1,7 @@
 from typing import Dict, Any, TypedDict, Literal
 import requests
-from base import Base
-from networks import get_network, get_chain_id
+from .base import Base
+from .networks import get_network, get_chain_id
 
 ENDPOINTS = {
     1: "https://api.etherscan.io",

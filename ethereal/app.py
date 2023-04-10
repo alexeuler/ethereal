@@ -1,7 +1,7 @@
-from containers import AppContainer
-from networks import get_chain_id
 from web3 import Web3
-from facade import EtherealFacade
+from .containers import AppContainer
+from .networks import get_chain_id
+from .facade import EtherealFacade
 
 
 class Ethereal(Web3):

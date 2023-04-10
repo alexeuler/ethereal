@@ -1,4 +1,4 @@
-from typing import TypedDict, Any
+from typing import TypedDict, Any, Callable
 from sqlite3 import Connection, connect
 from functools import cached_property
 from .base import Base
@@ -55,12 +55,10 @@ class MemoryCache(Base):
 class DbCache(Base):
     _config: CacheConfig
     _root: str
-    _conn: Connection | None
 
     def __init__(self, config: CacheConfig, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._config = config
-        self._conn = None
         if "root" in config:
             self._root = os.path.realpath(config["root"])
         else:
@@ -77,7 +75,7 @@ class DbCache(Base):
             data: The data to upsert
         """
         key_str = json.dumps(canonical_arguments(key))
-        self._upsert_str(key_str, data)
+        self._upsert_str(key_str, json.dumps(data))
 
     def delete(self, key: Any):
         """
@@ -100,25 +98,37 @@ class DbCache(Base):
             The value or None if not found
         """
         key_str = json.dumps(canonical_arguments(key))
-        return self._read_str(key_str)
+        res = self._read_str(key_str)
+        if res is None:
+            return None
+        return json.loads(res)
+
+    def commit(self):
+        """
+        Commit the cache to disk
+        """
+        self._conn.commit()
 
     def _read_str(self, key: str) -> bytes | None:
         cursor = self._conn.cursor()
-        statement = (
-            "SELECT data FROM cache WHERE key = ?",
+        statement = "SELECT data FROM cache WHERE key = ?"
+        cursor.execute(
+            statement,
             (key,),
         )
-        cursor.execute(statement)
-        return cursor.fetchone()
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        return row[0]
 
     def _upsert_str(self, key: str, data: bytes):
+        print(f"upserting {key}")
         cursor = self._conn.cursor()
         statement = (
             "INSERT INTO cache (key, data) VALUES (?,?) "
-            "ON CONFLICT(key) DO UPDATE SET data = excluded.data",
-            (key, data),
+            "ON CONFLICT(key) DO UPDATE SET data = excluded.data"
         )
-        cursor.execute(statement)
+        cursor.execute(statement, (key, data))
 
     def _delete_str(self, key: str):
         cursor = self._conn.cursor()
@@ -133,13 +143,7 @@ class DbCache(Base):
         """
         :class:`sqlite3.Connection` to a database cache
         """
-        if not self._conn is None:
-            return self._conn
-
-        if not self._conn:
-            self._conn = connection_from_path(f"{self._root}/cache.sqlite3")
-
-        return self._conn
+        return connection_from_path(f"{self._root}/cache.sqlite3")
 
 
 class Cache(Base):
@@ -150,6 +154,23 @@ class Cache(Base):
         super().__init__(*args, **kwargs)
         self._memory_cache = memory_cache
         self._db_cache = db_cache
+
+    def read_or_fetch(self, key: Any, fetcher: Callable) -> bytes:
+        """
+        Read a value from the cache or fetch it if not found
+
+        Args:
+            key: The key to read
+            fetcher: A function to fetch the value
+
+        Returns:
+            The value
+        """
+        value = self.read(key)
+        if value is None:
+            value = fetcher()
+            self.upsert(key, value)
+        return value
 
     def read(self, key: Any) -> bytes | None:
         """
@@ -180,6 +201,7 @@ class Cache(Base):
         """
         self._memory_cache.upsert(key, data)
         self._db_cache.upsert(key, data)
+        self._db_cache.commit()
 
     def delete(self, key: Any):
         """
@@ -228,7 +250,6 @@ def connection_from_path(path: str) -> Connection:
     conn = connect(path)
     if is_fresh:
         _init_db(conn)
-
     return conn
 
 
