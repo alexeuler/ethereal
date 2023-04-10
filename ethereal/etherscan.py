@@ -1,5 +1,6 @@
 from typing import Dict, Any, TypedDict, Literal
 import requests
+import json
 from .base import Base
 from .networks import get_network, get_chain_id
 
@@ -54,6 +55,14 @@ class Etherscan(Base):
         }
         return int(self._fetch(params, chain_id=chain_id))
 
+    def get_abi(self, address: str, chain_id: int | None = None) -> str:
+        params = {
+            "module": "contract",
+            "action": "getabi",
+            "address": address,
+        }
+        return self._fetch(params, chain_id=chain_id)
+
     def _fetch(
         self, params: Dict[str, Any], chain_id: int | None = None
     ) -> Dict[str, Any]:
@@ -67,7 +76,7 @@ class Etherscan(Base):
         resp = resp.json()
         if resp["status"] != "1":
             raise Exception(f"Error fetching data from etherscan: {resp['result']}")
-        return resp["result"]
+        return json.loads(resp["result"])
 
     def _get_key(self, chain_id: int | None = None) -> str:
         network = self._get_network(chain_id)

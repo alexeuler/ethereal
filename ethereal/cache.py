@@ -17,7 +17,7 @@ class MemoryCache(Base):
         super().__init__(*args, **kwargs)
         self._cache = {}
 
-    def read(self, key: Any) -> bytes | None:
+    def read(self, key: Any) -> Any:
         """
         Read a value from the cache
 
@@ -30,7 +30,7 @@ class MemoryCache(Base):
         key_str = json.dumps(canonical_arguments(key))
         return self._cache.get(key_str)
 
-    def upsert(self, key: Any, data: bytes):
+    def upsert(self, key: Any, data: Any):
         """
         Upsert a value into the cache
 
@@ -66,7 +66,7 @@ class DbCache(Base):
             self._root = f"{current_folder}/cache"
         os.makedirs(self._root, exist_ok=True)
 
-    def upsert(self, key: Any, data: bytes):
+    def upsert(self, key: Any, data: Any):
         """
         Upsert a value into the cache
 
@@ -75,7 +75,7 @@ class DbCache(Base):
             data: The data to upsert
         """
         key_str = json.dumps(canonical_arguments(key))
-        self._upsert_str(key_str, json.dumps(data))
+        self._upsert_str(key_str, data)
 
     def delete(self, key: Any):
         """
@@ -121,14 +121,15 @@ class DbCache(Base):
             return None
         return row[0]
 
-    def _upsert_str(self, key: str, data: bytes):
+    def _upsert_str(self, key: str, data: Any):
         print(f"upserting {key}")
         cursor = self._conn.cursor()
         statement = (
             "INSERT INTO cache (key, data) VALUES (?,?) "
             "ON CONFLICT(key) DO UPDATE SET data = excluded.data"
         )
-        cursor.execute(statement, (key, data))
+        print(data.__class__.__name__)
+        cursor.execute(statement, (key, json.dumps(data)))
 
     def _delete_str(self, key: str):
         cursor = self._conn.cursor()
@@ -155,7 +156,7 @@ class Cache(Base):
         self._memory_cache = memory_cache
         self._db_cache = db_cache
 
-    def read_or_fetch(self, key: Any, fetcher: Callable) -> bytes:
+    def read_or_fetch(self, key: Any, fetcher: Callable) -> Any:
         """
         Read a value from the cache or fetch it if not found
 
@@ -164,7 +165,7 @@ class Cache(Base):
             fetcher: A function to fetch the value
 
         Returns:
-            The value
+            The value as int / str / list / dict
         """
         value = self.read(key)
         if value is None:

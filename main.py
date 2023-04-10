@@ -2,6 +2,7 @@ import os
 import click
 from web3 import Web3
 from dependency_injector.wiring import inject
+import pprint
 from ethereal.networks import load_provider_from_uri
 from ethereal.app import Ethereal
 
@@ -45,6 +46,36 @@ def get_block_by_timestamp(
     """
 
     print(web3.e.get_block_by_timestamp(timestamp))
+
+
+@cli.command()
+@click.argument("address", type=str)
+@inject
+def get_abi(
+    address: str,
+):
+    """
+    Get ABI by contract address
+
+    @param address: Address of the contracts
+    """
+
+    print(web3.e.get_abi(address))
+
+
+@cli.command()
+@click.argument("address", type=str)
+@inject
+def list_events(
+    address: str,
+):
+    """
+    List events for contract address
+
+    @param address: Address of the contracts
+    """
+
+    pprint.pprint(web3.e.list_events(address))
 
 
 def start_cli():
