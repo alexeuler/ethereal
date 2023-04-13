@@ -33,7 +33,7 @@ class Ethereal(Web3):
         if not log_level is None:
             app.config.logging.loggers["root"].level.from_value(log_level)
 
-        app.config.etherscan.default_chain_id.from_value(chain_id)
+        app.config.etherscan.chain_id.from_value(chain_id)
 
         try:
             app.init_resources()

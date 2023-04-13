@@ -2,7 +2,7 @@ cache:
   root: ${ETHEREAL_CACHE_ROOT:./.ethereal_cache}
 
 etherscan:
-  default_chain_id: 1
+  chain_id: 1
   mainnet:
     key: X5QAW799H4EUJ81RB2F6HD5YW1MJUZEJ9Z
   polygon:

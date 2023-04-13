@@ -4,7 +4,7 @@ from functools import cache
 from hexbytes import HexBytes
 from eth_typing.encoding import HexStr
 from web3.datastructures import AttributeDict
-from web3.contract import (
+from web3.contract.contract import (
     Contract,
     ContractEvent,
     ContractFunction,
@@ -12,8 +12,6 @@ from web3.contract import (
     get_abi_output_types,
 )
 from eth_utils import function_abi_to_4byte_selector
-from .cache import AssetsCache
-from .rpc import RPC
 from .base import Base
 
 
@@ -33,10 +31,7 @@ def json_response(response: AttributeDict) -> str:
 
 
 class Contracts(Base):
-    _assets_cache: AssetsCache
-    _rpc: RPC
-
-    def __init__(self, assets_cache: AssetsCache, rpc: RPC, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._assets_cache = assets_cache
         self._rpc = rpc

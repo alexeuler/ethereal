@@ -13,10 +13,8 @@ class AppContainer(containers.DeclarativeContainer):
         yaml_files=[os.path.abspath(f"{current_folder}/../config.yml")]
     )
     logging = providers.Resource(logging.config.dictConfig, config=config.logging)
-    etherscan = providers.Factory(Etherscan, config=config.etherscan)
     memory_cache = providers.Factory(MemoryCache)
     db_cache = providers.Singleton(DbCache, config=config.cache)
     cache = providers.Factory(Cache, memory_cache=memory_cache, db_cache=db_cache)
-    ethereal_facade = providers.Factory(
-        EtherealFacade, cache=cache, etherscan=etherscan
-    )
+    etherscan = providers.Factory(Etherscan, config=config.etherscan, cache=cache)
+    ethereal_facade = providers.Factory(EtherealFacade, etherscan=etherscan)
