@@ -25,15 +25,15 @@ def load_provider_from_uri(uri_string: URI, timeout=10) -> BaseProvider:
     uri = urlparse(uri_string)
     if uri.scheme == "file":
         return IPCProvider(uri.path)
-    elif uri.scheme in ["http", "https"]:
+    if uri.scheme in ["http", "https"]:
         return HTTPProvider(uri_string, request_kwargs={"timeout": timeout})
-    elif uri.scheme in ["ws", "wss"]:
+    if uri.scheme in ["ws", "wss"]:
         return WebsocketProvider(uri_string, websocket_timeout=timeout)
-    else:
-        raise NotImplementedError(
-            "Web3 does not know how to connect to scheme "
-            f"{uri.scheme!r} in {uri_string!r}"
-        )
+
+    raise NotImplementedError(
+        "Web3 does not know how to connect to scheme "
+        f"{uri.scheme!r} in {uri_string!r}"
+    )
 
 
 def get_chain_id(network: str) -> int:
