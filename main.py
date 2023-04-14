@@ -3,6 +3,7 @@ import click
 from web3 import Web3
 from dependency_injector.wiring import inject
 import pprint
+import json
 from ethereal.networks import load_provider_from_uri
 from ethereal.app import Ethereal
 
@@ -50,17 +51,20 @@ def get_block_by_timestamp(
 
 @cli.command()
 @click.argument("address", type=str)
+@click.argument("proxy", type=bool, default=True)
 @inject
 def get_abi(
     address: str,
+    proxy: bool,
 ):
     """
     Get ABI by contract address
 
     @param address: Address of the contracts
+    @param proxy: Resolve proxy contracts. Default = True.
     """
 
-    print(web3.e.get_abi(address))
+    print(json.dumps(web3.e.get_abi(address, proxy), indent=4))
 
 
 @cli.command()
@@ -76,6 +80,30 @@ def list_events(
     """
 
     pprint.pprint(web3.e.list_events(address))
+
+
+@cli.command()
+@click.argument("address", type=str)
+@click.argument("event", type=str)
+@click.argument("from_time", type=str)
+@click.argument("to_time", type=str)
+@inject
+def get_events(
+    address: str,
+    event: str,
+    from_time: int | str,
+    to_time: int | str,
+):
+    """
+    Get events of a contract
+
+    @param address: Address of the contract
+    @param event: Event name
+    @param from_time: Date or unix timestamp or block number
+    @param to_time: Date or unix timestamp or block number
+    """
+
+    print(json.dumps(web3.e.get_events(address, event, from_time, to_time), indent=4))
 
 
 def start_cli():

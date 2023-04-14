@@ -17,4 +17,6 @@ class AppContainer(containers.DeclarativeContainer):
     db_cache = providers.Singleton(DbCache, config=config.cache)
     cache = providers.Factory(Cache, memory_cache=memory_cache, db_cache=db_cache)
     etherscan = providers.Factory(Etherscan, config=config.etherscan, cache=cache)
-    ethereal_facade = providers.Factory(EtherealFacade, etherscan=etherscan)
+    ethereal_facade = providers.Factory(
+        EtherealFacade, etherscan=etherscan, cache=cache
+    )

@@ -1,9 +1,14 @@
 from typing import Dict, Any, TypedDict, Literal, List
 import requests
 import json
+from datetime import datetime
+from dateutil.parser import parse
+import time
 from .cache import Cache
 from .base import Base
 from .networks import get_network
+
+ETH_START_TIMESTAMP = int(time.mktime(datetime(2015, 7, 30).timetuple()))
 
 ENDPOINTS = {
     1: "https://api.etherscan.io",
@@ -54,16 +59,28 @@ class Etherscan(Base):
             lambda: self._get_block_by_timestamp(timestamp, closest),
         )
 
+    def to_block(self, ts: int | str | datetime) -> int:
+        if isinstance(ts, int):
+            # block or timestamp
+            if ts < ETH_START_TIMESTAMP:
+                # block
+                return ts
+            # timestamp
+            return self.get_block_by_timestamp(ts)
+        if isinstance(ts, datetime):
+            ts = int(time.mktime(ts.timetuple()))
+            return self.get_block_by_timestamp(ts)
+        # parseable date
+        date = parse(ts)
+        ts = int(time.mktime(date.timetuple()))
+        return self.get_block_by_timestamp(ts)
+
     def get_abi(self, address: str) -> str:
         return self._cache.read_or_fetch(
             ["etherscan", "get_abi", address],
             lambda: self._get_abi(address),
         )
-
-    def list_events(self, address: str) -> List[str]:
-        abi = self.get_abi(address)
-        return [self._event_signature(e) for e in abi if e["type"] == "event"]
-
+        
     def _get_block_by_timestamp(
         self, timestamp: int, closest: Literal["before", "after"] = "after"
     ) -> int:

@@ -21,7 +21,7 @@ class Ethereal(Web3):
 
         if self._facade is None:
             app = self._init_app()
-            self._facade = app.ethereal_facade()
+            self._facade = app.ethereal_facade(web3=self._w3)
 
         return self._facade
 
