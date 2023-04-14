@@ -1,10 +1,9 @@
 from typing import Dict, Any, Union
 import json
-from functools import cache
+from datetime import datetime
 from hexbytes import HexBytes
 from eth_typing.encoding import HexStr
 from requests.exceptions import ReadTimeout
-from datetime import datetime
 from web3 import Web3
 from web3.datastructures import AttributeDict
 from web3.contract.contract import (
@@ -21,6 +20,10 @@ from .cache import Cache
 
 
 class Web3JsonEncoder(json.JSONEncoder):
+    """
+    Custom JSON encoder for Web3 objects.
+    """
+
     def default(self, o: Any) -> Union[Dict[Any, Any], HexStr]:
         if isinstance(o, AttributeDict):
             return dict(o.items())
@@ -32,10 +35,17 @@ class Web3JsonEncoder(json.JSONEncoder):
 
 
 def json_response(response: AttributeDict) -> str:
+    """
+    Convert a Web3 response to JSON.
+    """
     return json.dumps(response, cls=Web3JsonEncoder)
 
 
 class Contracts(Base):
+    """
+    Web3 Contract related functionality.
+    """
+
     _etherscan: Etherscan
     _web3: Web3
     _cache: Cache
@@ -47,20 +57,43 @@ class Contracts(Base):
         self._cache = cache
 
     def calldata(self, call: ContractFunction) -> str:
+        """
+        Get the calldata for a given function call.
+
+        :param call: The contract call.
+        """
         selector = HexBytes(function_abi_to_4byte_selector(call.abi)).hex()
         abi_types = get_abi_input_types(call.abi)
         bytes_calldata = self._rpc.codec.encode(abi_types, call.args)
         return selector + HexBytes(bytes_calldata).hex()[2:]
 
     def decode_response(self, call: ContractFunction, response: Any) -> Any:
+        """
+        Decode a response from a contract call.
+
+        :param call: The contract call.
+        :param response: The response to decode.
+        """
         abi = get_abi_output_types(call.abi)
         return self._rpc.codec.decode(abi, response)
 
     def get_contract(self, address: str, resolve_proxy: bool) -> Contract:
+        """
+        Get a contract for a given address.
+
+        :param address: The address to look up.
+        :param resolve_proxy: Whether to resolve a proxy contract abi.
+        """
         abi = self.get_abi(address, resolve_proxy)
         return self._web3.eth.contract(address=address, abi=abi)
 
     def get_abi(self, address: str, resolve_proxy: bool) -> list[dict[str, Any]]:
+        """
+        Get the ABI for a given address.
+
+        :param address: The address to look up.
+        :param resolve_proxy: Whether to resolve a proxy contract abi.
+        """
         abi = self._etherscan.get_abi(address)
         if not resolve_proxy:
             return abi
@@ -73,8 +106,14 @@ class Contracts(Base):
                 return self._etherscan.get_abi(implementation)
         return abi
 
-    def list_events(self, address: str) -> list[str]:
-        abi = self.get_abi(address)
+    def list_events(self, address: str, resolve_proxy: bool) -> list[str]:
+        """
+        List all events for a given address.
+
+        :param address: The address to look up.
+        :param resolve_proxy: Whether to resolve a proxy contract abi.
+        """
+        abi = self.get_abi(address, resolve_proxy)
         return [self._event_signature(e) for e in abi if e["type"] == "event"]
 
     def get_events(
@@ -86,6 +125,16 @@ class Contracts(Base):
         argument_filters: Dict[str, Any] | None = None,
         resolve_proxy: bool = True,
     ) -> list[dict[str, Any]]:
+        """
+        Get events for a given address.
+
+        :param address: The address to look up.
+        :param event: The event to look up.
+        :param from_time: The start time to look up.
+        :param to_time: The end time to look up.
+        :param argument_filters: The argument filters to apply.
+        :param resolve_proxy: Whether to resolve a proxy contract abi.
+        """
         contract = self.get_contract(address, resolve_proxy)
         contract_event = contract.events[event]
         from_block = self._etherscan.to_block(from_time)
@@ -172,11 +221,11 @@ class Contracts(Base):
         abi = self._etherscan.get_abi(address)
         return self._web3.eth.contract(address=address, abi=abi)
 
-    def __getattr__(self, name):
-        if name in self._registry():
-            return self._contract(self._registry()[name], name)
+    def _event_signature(self, event_abi: Dict[str, Any]) -> str:
+        return f"{event_abi['name']}({','.join([self._event_type(p) for p in event_abi['inputs']])})"
 
-        def _contract(*args, **kwargs):
-            return self._contract(args[0], name)
-
-        return _contract
+    def _event_type(self, event_type_abi: Dict[str, Any]) -> str:
+        res = f"{event_type_abi['type']} {event_type_abi['name']}"
+        if event_type_abi["indexed"]:
+            res = f"indexed {res}"
+        return res

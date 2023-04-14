@@ -3,6 +3,7 @@ cache:
 
 etherscan:
   chain_id: 1
+  timeout: 30
   mainnet:
     key: X5QAW799H4EUJ81RB2F6HD5YW1MJUZEJ9Z
   polygon:

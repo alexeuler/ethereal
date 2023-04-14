@@ -1,0 +1,2 @@
+.. automodule:: ethereal.facade
+        :members:

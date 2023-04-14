@@ -1,16 +1,21 @@
 from web3 import Web3
 from .containers import AppContainer
-from .networks import get_chain_id
 from .facade import EtherealFacade
 
 
 class Ethereal(Web3):
+    """
+    This is a thin proxy around Web3 that initializes Ethereal on demand.
+    The actual methods are defined in the :class:`EtherealFacade`.
+    """
+
     _log_level: str | None
     _facade: EtherealFacade | None
     _w3: Web3
     e: EtherealFacade
 
     def __init__(self, w3: Web3, log_level: str | None = None):
+        # pylint: disable=super-init-not-called
         self._w3 = w3
         self._log_level = log_level
         self._facade = None

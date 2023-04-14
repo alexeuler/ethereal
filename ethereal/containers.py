@@ -9,6 +9,10 @@ current_folder = os.path.realpath(os.path.dirname(__file__))
 
 
 class AppContainer(containers.DeclarativeContainer):
+    """
+    The dependency injection container for Ethereal
+    """
+
     config = providers.Configuration(
         yaml_files=[os.path.abspath(f"{current_folder}/../config.yml")]
     )

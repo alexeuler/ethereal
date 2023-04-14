@@ -1,5 +1,5 @@
-from web3.providers import BaseProvider, HTTPProvider, IPCProvider, WebsocketProvider
 from urllib.parse import urlparse
+from web3.providers import BaseProvider, HTTPProvider, IPCProvider, WebsocketProvider
 from eth_typing import URI
 
 CHAIN_IDS_INDEX = {
@@ -40,7 +40,7 @@ def get_chain_id(network: str) -> int:
     """
     Returns the chain ID for a given network name
 
-    @param network: The network name to get the chain ID for
+    :param network: The network name to get the chain ID for
 
     """
     return NETWORKS_INDEX[network.lower()]
@@ -50,6 +50,6 @@ def get_network(chain_id: int) -> str:
     """
     Returns the network name for a given chain_id
 
-    @param chain_id: The chain ID to get the network name for
+    :param chain_id: The chain ID to get the network name for
     """
     return CHAIN_IDS_INDEX[chain_id]

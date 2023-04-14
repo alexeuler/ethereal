@@ -1,0 +1,8 @@
+[MAIN]
+
+ignore=test,docs,examples
+disable = C0114,W0603,E1101,line-too-long,too-many-arguments,too-many-locals,too-many-return-statements,too-many-instance-attributes,duplicate-code,logging-fstring-interpolation,c-extension-no-member
+argument-rgx=[a-z_][a-z0-9_]{0,30}$
+variable-rgx=[a-z_][a-z0-9_]{0,30}$
+method-rgx=[a-z_][a-z0-9_]{0,50}$
+init-hook='import sys; sys.path.append(".")'

@@ -1,9 +1,9 @@
-from typing import Dict, Any, TypedDict, Literal, List
-import requests
+from typing import Dict, Any, TypedDict, Literal
 import json
 from datetime import datetime
-from dateutil.parser import parse
 import time
+import requests
+from dateutil.parser import parse
 from .cache import Cache
 from .base import Base
 from .networks import get_network
@@ -24,12 +24,27 @@ ENDPOINTS = {
 }
 
 
+class EtherscanError(Exception):
+    """
+    Etherscan error
+    """
+
+
 class EtherscanNetworkConfig(TypedDict):
+    """
+    Etherscan network configuration
+    """
+
     key: str
 
 
 class EtherscanConfig(TypedDict):
+    """
+    Etherscan configuration
+    """
+
     chain_id: str | int
+    timeout: str
     mainnet: EtherscanNetworkConfig
     polygon: EtherscanNetworkConfig
     avalanche: EtherscanNetworkConfig
@@ -39,6 +54,10 @@ class EtherscanConfig(TypedDict):
 
 
 class Etherscan(Base):
+    """
+    Etherscan API client
+    """
+
     _config: EtherscanConfig
     _cache: Cache
     _chain_id: int
@@ -54,12 +73,23 @@ class Etherscan(Base):
         timestamp: int,
         closest: Literal["before", "after"] = "after",
     ) -> int:
+        """
+        Get the block number for a given timestamp.
+
+        :param timestamp: The timestamp to look up.
+        :param closest: Whether to return the block closest to the timestamp before or after.
+        """
         return self._cache.read_or_fetch(
             ["etherscan", "get_block_by_timestamp", timestamp, closest],
             lambda: self._get_block_by_timestamp(timestamp, closest),
         )
 
     def to_block(self, ts: int | str | datetime) -> int:
+        """
+        Convert a timestamp to a block number.
+
+        :param ts: The timestamp to convert.
+        """
         if isinstance(ts, int):
             # block or timestamp
             if ts < ETH_START_TIMESTAMP:
@@ -76,11 +106,16 @@ class Etherscan(Base):
         return self.get_block_by_timestamp(ts)
 
     def get_abi(self, address: str) -> str:
+        """
+        Get the ABI for a given address.
+
+        :param address: The address to look up.
+        """
         return self._cache.read_or_fetch(
             ["etherscan", "get_abi", address],
             lambda: self._get_abi(address),
         )
-        
+
     def _get_block_by_timestamp(
         self, timestamp: int, closest: Literal["before", "after"] = "after"
     ) -> int:
@@ -100,28 +135,19 @@ class Etherscan(Base):
         }
         return self._fetch(params)
 
-    def _event_signature(self, event_abi: Dict[str, Any]) -> str:
-        return f"{event_abi['name']}({','.join([self._event_type(p) for p in event_abi['inputs']])})"
-
-    def _event_type(self, event_type_abi: Dict[str, Any]) -> str:
-        res = f"{event_type_abi['type']} {event_type_abi['name']}"
-        if event_type_abi["indexed"]:
-            res = f"indexed {res}"
-        return res
-
-    def _fetch(
-        self, params: Dict[str, Any], chain_id: int | None = None
-    ) -> Dict[str, Any]:
+    def _fetch(self, params: Dict[str, Any]) -> Dict[str, Any]:
         endpoint = self._endpoint()
         params_str = "&".join([f"{k}={v}" for k, v in params.items()])
         url = f"{endpoint}/api?{params_str}"
         url_with_api_key = f"{url}&apiKey={self._get_key()}"
         self.logger.debug(f"Fetching {url} from etherscan")
-        resp = requests.get(url_with_api_key)
+        resp = requests.get(url_with_api_key, timeout=int(self._config["timeout"]))
         self.logger.debug(f"Got response {resp.status_code}")
         resp = resp.json()
         if resp["status"] != "1":
-            raise Exception(f"Error fetching data from etherscan: {resp['result']}")
+            raise EtherscanError(
+                f"Error fetching data from etherscan: {resp['result']}"
+            )
         return json.loads(resp["result"])
 
     def _get_key(self) -> str:

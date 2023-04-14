@@ -1,16 +1,24 @@
 from typing import TypedDict, Any, Callable
+import os
+import json
 from sqlite3 import Connection, connect
 from functools import cached_property
 from .base import Base
-import os
-import json
 
 
 class CacheConfig(TypedDict):
+    """
+    Cache configuration
+    """
+
     root: str | None
 
 
 class MemoryCache(Base):
+    """
+    In-memory cache
+    """
+
     _cache: dict[str, bytes]
 
     def __init__(self, *args, **kwargs):
@@ -53,6 +61,10 @@ class MemoryCache(Base):
 
 
 class DbCache(Base):
+    """
+    Database cache
+    """
+
     _config: CacheConfig
     _root: str
 
@@ -148,6 +160,10 @@ class DbCache(Base):
 
 
 class Cache(Base):
+    """
+    Cache that uses both memory and database
+    """
+
     _memory_cache: MemoryCache
     _db_cache: DbCache
 

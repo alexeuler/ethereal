@@ -1,9 +1,9 @@
 import os
+import pprint
+import json
 import click
 from web3 import Web3
 from dependency_injector.wiring import inject
-import pprint
-import json
 from ethereal.networks import load_provider_from_uri
 from ethereal.app import Ethereal
 
@@ -30,6 +30,9 @@ web3: Ethereal = None
     help="RPC endpoint to use",
 )
 def cli(log_level: str | None, rpc: str | None):
+    """
+    Ethereal CLI
+    """
     global web3
     web3 = Ethereal(Web3(load_provider_from_uri(rpc)), log_level)
 
@@ -69,17 +72,20 @@ def get_abi(
 
 @cli.command()
 @click.argument("address", type=str)
+@click.argument("proxy", type=bool, default=True)
 @inject
 def list_events(
     address: str,
+    proxy: bool,
 ):
     """
     List events for contract address
 
     @param address: Address of the contracts
+    @param proxy: Resolve proxy contracts. Default = True.
     """
 
-    pprint.pprint(web3.e.list_events(address))
+    pprint.pprint(web3.e.list_events(address, proxy))
 
 
 @cli.command()
@@ -107,6 +113,10 @@ def get_events(
 
 
 def start_cli():
+    """
+    Start the CLI
+    """
+    # pylint: disable=no-value-for-parameter
     cli(auto_envvar_prefix="ETHEREAL")
 
 
