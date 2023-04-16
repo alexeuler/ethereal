@@ -1,4 +1,3 @@
-"""
 Ethereal is a lightweight wrapper around the :class:`web3.Web3` class that simplifies 
 working with Ethereum smart contracts.
 
@@ -30,8 +29,3 @@ Example:
         events = w3.e.get_events(ADDRESS, "Transfer", "2023-01-01", "2023-02-14")
         # Gets all Transfer events for the contract at ADDRESS between 2023-01-01 and 2023-02-14
         print(events[:10])
-
-"""
-
-from .app import Ethereal
-from .networks import load_provider_from_uri

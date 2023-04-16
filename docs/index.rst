@@ -1,5 +1,8 @@
-.. toctree::
-   :maxdepth: 1
-   :caption: Api
+Ethereal
+========
 
-   facade
+.. automodule:: ethereal
+        :members:
+
+.. automodule:: ethereal.facade
+        :members:

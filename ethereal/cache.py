@@ -134,13 +134,11 @@ class DbCache(Base):
         return row[0]
 
     def _upsert_str(self, key: str, data: Any):
-        print(f"upserting {key}")
         cursor = self._conn.cursor()
         statement = (
             "INSERT INTO cache (key, data) VALUES (?,?) "
             "ON CONFLICT(key) DO UPDATE SET data = excluded.data"
         )
-        print(data.__class__.__name__)
         cursor.execute(statement, (key, json.dumps(data)))
 
     def _delete_str(self, key: str):
