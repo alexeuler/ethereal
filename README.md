@@ -14,7 +14,7 @@ accessible under the `e` property.
 For example, you can call `w3.e.get_abi("0x...")` or
 `w3.e.list_events("0x...", "Mint", "2023-01-01", "2023-02-14")`.
 
-For more available methods, please refer to the :class:`ethereal.facade.EtherealFacade` class.
+For more available methods, please refer to the [EtherealFacade](https://ethereal.readthedocs.io/en/latest/?badge=latest#ethereal.facade.EtherealFacade) class.
 
 ### Example
 
