@@ -1,3 +1,5 @@
+![Ethereal cat](./docs/images/ethereal_cat.png)
+
 ## Ethereal
 
 Ethereal is a lightweight wrapper around the [Web3](https://web3py.readthedocs.io/en/stable/web3.main.html#web3.Web3) class that simplifies
