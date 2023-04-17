@@ -1,17 +1,19 @@
-Ethereal is a lightweight wrapper around the :class:`web3.Web3` class that simplifies 
+## Ethereal
+
+Ethereal is a lightweight wrapper around the [Web3](https://web3py.readthedocs.io/en/stable/web3.main.html#web3.Web3) class that simplifies
 working with Ethereum smart contracts.
 
-To use it, simply create a regular :class:`web3.Web3` instance and write ``w3 = Ethereal(w3)``.
-Then, you can use w3 as usual, but with additional methods 
-accessible under the ``e`` property. 
+To use it, simply create a regular [Web3](https://web3py.readthedocs.io/en/stable/web3.main.html#web3.Web3) instance and write `w3 = Ethereal(w3)`.
+Then, you can use w3 as usual, but with additional methods
+accessible under the `e` property.
 
-For example, you can call ``w3.e.get_abi("0x...")`` or 
-``w3.e.list_events("0x...", "Mint", "2023-01-01", "2023-02-14")``.
+For example, you can call `w3.e.get_abi("0x...")` or
+`w3.e.list_events("0x...", "Mint", "2023-01-01", "2023-02-14")`.
 
 For more available methods, please refer to the :class:`ethereal.facade.EtherealFacade` class.
 
 Example:
-    ::
+::
 
         from web3.auto import w3
         from ethereal import Ethereal

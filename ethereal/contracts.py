@@ -11,6 +11,7 @@ from web3.contract.contract import (
     ContractEvent,
     ContractFunction,
 )
+from web3.exceptions import ContractLogicError
 from web3._utils.abi import get_abi_input_types, get_abi_output_types
 
 from eth_utils import function_abi_to_4byte_selector
@@ -85,7 +86,9 @@ class Contracts(Base):
         :param resolve_proxy: Whether to resolve a proxy contract abi.
         """
         abi = self.get_abi(address, resolve_proxy)
-        return self._web3.eth.contract(address=address, abi=abi)
+        return self._web3.eth.contract(
+            address=self._web3.to_checksum_address(address), abi=abi
+        )
 
     def get_abi(self, address: str, resolve_proxy: bool) -> list[dict[str, Any]]:
         """
@@ -101,9 +104,20 @@ class Contracts(Base):
             if not "name" in f:
                 continue
             if f["name"] == "implementation":
-                contract = self._get_contract(address)
-                implementation = contract.functions.implementation().call()
-                return self._etherscan.get_abi(implementation)
+                try:
+                    contract = self._get_contract(address)
+                    implementation = contract.functions.implementation().call()
+                    return self._etherscan.get_abi(implementation)
+                except ContractLogicError:
+                    implementation_slot = "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+                    implementation_address = self._web3.eth.get_storage_at(
+                        address, implementation_slot
+                    )
+                    implementation_address = (
+                        implementation_address[-20:].rjust(20, b"\x00").hex()
+                    )
+                    implementation_address = f"0x{implementation_address}"
+                    return self._etherscan.get_abi(implementation_address)
         return abi
 
     def list_events(self, address: str, resolve_proxy: bool) -> list[str]:
@@ -219,7 +233,9 @@ class Contracts(Base):
 
     def _get_contract(self, address: str) -> Contract:
         abi = self._etherscan.get_abi(address)
-        return self._web3.eth.contract(address=address, abi=abi)
+        return self._web3.eth.contract(
+            address=self._web3.to_checksum_address(address), abi=abi
+        )
 
     def _event_signature(self, event_abi: Dict[str, Any]) -> str:
         return f"{event_abi['name']}({','.join([self._event_type(p) for p in event_abi['inputs']])})"
