@@ -14,8 +14,9 @@ For example, you can call `w3.e.get_abi("0x...")` or
 
 For more available methods, please refer to the :class:`ethereal.facade.EtherealFacade` class.
 
-Example:
-::
+### Example
+
+```python
 
         from web3.auto import w3
         from ethereal import Ethereal
@@ -33,3 +34,10 @@ Example:
         events = w3.e.get_events(ADDRESS, "Transfer", "2023-01-01", "2023-02-14")
         # Gets all Transfer events for the contract at ADDRESS between 2023-01-01 and 2023-02-14
         print(events[:10])
+```
+
+### Install
+
+```
+pip install ethereal
+```
