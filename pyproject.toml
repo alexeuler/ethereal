@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "ethereal"
 version = "0.1.1"
-description = ""
+description = "Ergonomic python tooling for web3"
 authors = ["Alex Euler <0xalexeuler@gmail.com>"]
 license = "MIT"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
