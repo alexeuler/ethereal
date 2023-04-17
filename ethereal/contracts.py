@@ -97,6 +97,7 @@ class Contracts(Base):
         :param address: The address to look up.
         :param resolve_proxy: Whether to resolve a proxy contract abi.
         """
+        address = self._web3.to_checksum_address(address)
         abi = self._etherscan.get_abi(address)
         if not resolve_proxy:
             return abi
