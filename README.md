@@ -1,4 +1,4 @@
-![Ethereal cat](./docs/images/ethereal_cat.png)
+![Ethereal logo](./docs/images/ethereal_cat.png)
 
 ## Ethereal
 
