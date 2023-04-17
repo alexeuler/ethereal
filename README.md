@@ -19,23 +19,22 @@ For more available methods, please refer to the :class:`ethereal.facade.Ethereal
 ### Example
 
 ```python
+from web3.auto import w3
+from ethereal import Ethereal
+from ethereal import load_provider_from_uri
 
-        from web3.auto import w3
-        from ethereal import Ethereal
-        from ethereal import load_provider_from_uri
+# If WEB3_PROVIDER_URI env is not set, uncomment the lines below
+# w3 = Web3(load_provider_from_uri("https://alchemy.com/..."))
 
-        # If WEB3_PROVIDER_URI env is not set, uncomment the lines below
-        # w3 = Web3(load_provider_from_uri("https://alchemy.com/..."))
+w3 = Ethereal(w3)
 
-        w3 = Ethereal(w3)
+ADDRESS = "0xB0B195aEFA3650A6908f15CdaC7D92F8a5791B0B"
+print(w3.e.list_events(ADDRESS))
+# Lists event signatures for the contract at ADDRESS
 
-        ADDRESS = "0xB0B195aEFA3650A6908f15CdaC7D92F8a5791B0B"
-        print(w3.e.list_events(ADDRESS))
-        # Lists event signatures for the contract at ADDRESS
-
-        events = w3.e.get_events(ADDRESS, "Transfer", "2023-01-01", "2023-02-14")
-        # Gets all Transfer events for the contract at ADDRESS between 2023-01-01 and 2023-02-14
-        print(events[:10])
+events = w3.e.get_events(ADDRESS, "Transfer", "2023-01-01", "2023-02-14")
+# Gets all Transfer events for the contract at ADDRESS between 2023-01-01 and 2023-02-14
+print(events[:10])
 ```
 
 ### Install
