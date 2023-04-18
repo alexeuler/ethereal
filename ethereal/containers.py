@@ -14,7 +14,7 @@ class AppContainer(containers.DeclarativeContainer):
     """
 
     config = providers.Configuration(
-        yaml_files=[os.path.abspath(f"{current_folder}/../config.yml")]
+        yaml_files=[os.path.abspath(f"{current_folder}/config.yml")]
     )
     logging = providers.Resource(logging.config.dictConfig, config=config.logging)
     memory_cache = providers.Factory(MemoryCache)
