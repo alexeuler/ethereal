@@ -16,6 +16,10 @@ For example, you can call `w3.e.get_abi("0x...")` or
 
 For more available methods, please refer to the [EtherealFacade](https://ethereal.readthedocs.io/en/latest/?badge=latest#ethereal.facade.EtherealFacade) class.
 
+### Demo
+
+![Ethereal demo](./docs/images/demo.gif)
+
 ### Example
 
 ```python
