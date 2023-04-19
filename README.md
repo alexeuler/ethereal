@@ -55,3 +55,7 @@ pip install ethereal
 - Fantom
 - Arbitrum
 - Optimism
+
+### Contributing
+
+Feel free to create feature requests or pull requests :D
