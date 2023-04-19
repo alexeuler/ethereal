@@ -46,3 +46,12 @@ print(events[:10])
 ```
 pip install ethereal
 ```
+
+### Supported networks
+
+- Ethereum
+- Polygon
+- Avalanche
+- Fantom
+- Arbitrum
+- Optimism
