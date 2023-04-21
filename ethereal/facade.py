@@ -70,18 +70,21 @@ class EtherealFacade:
         """
         return self._contracts().get_contract(address, resolve_proxy)
 
-    def derive_account(self, seed_phrase: str, index: int) -> Account:
+    def derive_account(
+        self, seed_phrase: str, index: int, passphrase: str = None
+    ) -> Account:
         """
         Derive public and a private key from a seed phrase (Metamask or other bip 44)
 
         :param seed_phrase: The seed phrase to use
         :param index: The index to use
+        :param passphrase: The passphrase to use
 
         :return: The pubic and private key
         """
-        return self._accounts.derive_account(seed_phrase, index)
+        return self._accounts.derive_account(seed_phrase, index, passphrase)
 
-    def generate_mnemonic(self, strength: int = 128) -> str:
+    def generate_seed_phrase(self, strength: int = 128) -> str:
         """
         Generate a mnemonic
 
@@ -89,7 +92,7 @@ class EtherealFacade:
 
         :return: The mnemonic
         """
-        return self._accounts.generate_mnemonic(strength=strength)
+        return self._accounts.generate_seed_phrase(strength=strength)
 
     def get_events(
         self,

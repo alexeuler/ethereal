@@ -55,25 +55,28 @@ def get_block_by_timestamp(
 @cli.command()
 @click.argument("seed_phrase", type=str)
 @click.argument("index", type=int)
+@click.option("-p", "--passphrase", type=str, help="Passphrase to use")
 @inject
 def derive_account(
     seed_phrase: str,
     index: int,
+    passphrase: str | None = None,
 ):
     """
     Derive metamask account from seed_phrase
 
     @param seed_phrase: Seed phrase to use
     @param index: Index to use
+    @param passphrase: Passphrase to use
     """
 
-    print(web3.e.derive_account(seed_phrase, index))
+    print(web3.e.derive_account(seed_phrase, index, passphrase))
 
 
 @cli.command()
 @click.argument("strength", type=int, default=128)
 @inject
-def generate_mnemonic(
+def generate_seed_phrase(
     strength: int,
 ):
     """
@@ -82,7 +85,7 @@ def generate_mnemonic(
     @param strength: Strength of the mnemonic. Default = 128 (12 words)
     """
 
-    print(web3.e.generate_mnemonic(strength))
+    print(web3.e.generate_seed_phrase(strength))
 
 
 @cli.command()
