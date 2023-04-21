@@ -81,6 +81,16 @@ class EtherealFacade:
         """
         return self._accounts.derive_account(seed_phrase, index)
 
+    def generate_mnemonic(self, strength: int = 128) -> str:
+        """
+        Generate a mnemonic
+
+        :param strength: The strength of the mnemonic. Default = 128 (12 words)
+
+        :return: The mnemonic
+        """
+        return self._accounts.generate_mnemonic(strength=strength)
+
     def get_events(
         self,
         address: str,

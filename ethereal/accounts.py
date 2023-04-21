@@ -1,6 +1,6 @@
 from typing import TypedDict
 from hdwallet import BIP44HDWallet
-from hdwallet.hdwallet import Mnemonic
+from hdwallet.utils import generate_mnemonic
 from hdwallet.symbols import ETH as SYMBOL
 
 
@@ -15,7 +15,7 @@ class Account(TypedDict):
 
 class Accounts:
     """
-    Accounts
+    Working with accounts
     """
 
     def derive_account(self, seed_phrase: str, index: int) -> Account:
@@ -32,3 +32,13 @@ class Accounts:
         wallet.clean_derivation()
         wallet.from_path(path)
         return {"address": wallet.address(), "private_key": wallet.private_key()}
+
+    def generate_mnemonic(self, strength: int = 128) -> str:
+        """
+        Generate a mnemonic
+
+        :param strength: The strength of the mnemonic. Default = 128 (12 words)
+
+        :return: The mnemonic
+        """
+        return generate_mnemonic(strength=strength)

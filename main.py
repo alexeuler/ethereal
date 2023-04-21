@@ -71,6 +71,21 @@ def derive_account(
 
 
 @cli.command()
+@click.argument("strength", type=int, default=128)
+@inject
+def generate_mnemonic(
+    strength: int,
+):
+    """
+    Generate a mnemonic
+
+    @param strength: Strength of the mnemonic. Default = 128 (12 words)
+    """
+
+    print(web3.e.generate_mnemonic(strength))
+
+
+@cli.command()
 @click.argument("address", type=str)
 @click.argument("proxy", type=bool, default=True)
 @inject
