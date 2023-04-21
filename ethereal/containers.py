@@ -1,6 +1,7 @@
 import os
 import logging.config
 from dependency_injector import containers, providers
+from .accounts import Accounts
 from .etherscan import Etherscan
 from .facade import EtherealFacade
 from .cache import MemoryCache, DbCache, Cache
@@ -21,6 +22,7 @@ class AppContainer(containers.DeclarativeContainer):
     db_cache = providers.Singleton(DbCache, config=config.cache)
     cache = providers.Factory(Cache, memory_cache=memory_cache, db_cache=db_cache)
     etherscan = providers.Factory(Etherscan, config=config.etherscan, cache=cache)
+    accounts = providers.Factory(Accounts)
     ethereal_facade = providers.Factory(
-        EtherealFacade, etherscan=etherscan, cache=cache
+        EtherealFacade, etherscan=etherscan, accounts=accounts, cache=cache
     )

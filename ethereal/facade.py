@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 from datetime import datetime
 from web3 import Web3
 from web3.contract import Contract
+from .accounts import Accounts, Account
 from .etherscan import Etherscan
 from .contracts import Contracts
 from .cache import Cache
@@ -14,12 +15,22 @@ class EtherealFacade:
 
     _etherscan: Etherscan
     _web3: Web3
+    _accounts: Accounts
     _cache: Cache
 
-    def __init__(self, etherscan: Etherscan, web3: Web3, cache: Cache, *args, **kwargs):
+    def __init__(
+        self,
+        etherscan: Etherscan,
+        web3: Web3,
+        accounts: Accounts,
+        cache: Cache,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self._etherscan = etherscan
         self._web3 = web3
+        self._accounts = accounts
         self._cache = cache
 
     def get_block_by_timestamp(self, timestamp: int = True) -> int:
@@ -58,6 +69,17 @@ class EtherealFacade:
                               implementation contract will be used.
         """
         return self._contracts().get_contract(address, resolve_proxy)
+
+    def derive_account(self, seed_phrase: str, index: int) -> Account:
+        """
+        Derive public and a private key from a seed phrase (Metamask or other bip 44)
+
+        :param seed_phrase: The seed phrase to use
+        :param index: The index to use
+
+        :return: The pubic and private key
+        """
+        return self._accounts.derive_account(seed_phrase, index)
 
     def get_events(
         self,

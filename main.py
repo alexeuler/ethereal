@@ -53,6 +53,24 @@ def get_block_by_timestamp(
 
 
 @cli.command()
+@click.argument("seed_phrase", type=str)
+@click.argument("index", type=int)
+@inject
+def derive_account(
+    seed_phrase: str,
+    index: int,
+):
+    """
+    Derive metamask account from seed_phrase
+
+    @param seed_phrase: Seed phrase to use
+    @param index: Index to use
+    """
+
+    print(web3.e.derive_account(seed_phrase, index))
+
+
+@cli.command()
 @click.argument("address", type=str)
 @click.argument("proxy", type=bool, default=True)
 @inject
