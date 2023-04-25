@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ethereal"
-version = "0.1.6"
+version = "0.1.8"
 description = "Ergonomic python tooling for web3"
 authors = ["Alex Euler <0xalexeuler@gmail.com>"]
 license = "MIT"

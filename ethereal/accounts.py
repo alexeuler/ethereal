@@ -1,6 +1,6 @@
 from typing import TypedDict
 from hdwallet import BIP44HDWallet
-from hdwallet.utils import generate_seed_phrase
+from hdwallet.utils import generate_seed_phrase as generate_mnemominc
 from hdwallet.symbols import ETH as SYMBOL
 
 
@@ -46,4 +46,4 @@ class Accounts:
 
         :return: The mnemonic
         """
-        return generate_seed_phrase(strength=strength)
+        return generate_mnemominc(strength=strength)
