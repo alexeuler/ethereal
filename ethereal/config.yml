@@ -16,22 +16,3 @@ etherscan:
     key: HV27JNZG6AF6UEE2F9KEJSD3713SMN3RAP
   optimism:
     key: 9N9DPD2T7FWG8RNWVIH36VM13S6P42898N
-
-logging:
-  version: 1
-
-  loggers:
-    root:
-      level: ${ETHEREAL_LOG_LEVEL:INFO}
-      handlers: [console]
-
-  handlers:
-    console:
-      class: logging.StreamHandler
-      formatter: default
-      stream: ext://sys.stdout
-
-  formatters:
-    default:
-      format: "[%(asctime)s %(levelname)s %(name)s] %(message)s"
-      datefmt: "%Y-%m-%dT%H:%M:%S"
