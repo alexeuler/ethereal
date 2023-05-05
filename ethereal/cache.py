@@ -143,11 +143,8 @@ class DbCache(Base):
 
     def _delete_str(self, key: str):
         cursor = self._conn.cursor()
-        statement = (
-            "DELETE FROM cache WHERE key = ?",
-            (key,),
-        )
-        cursor.execute(statement)
+        statement = ("DELETE FROM cache WHERE key = ?",)
+        cursor.execute(statement, (key,))
 
     @cached_property
     def _conn(self) -> Connection:
@@ -227,6 +224,7 @@ class Cache(Base):
         """
         self._memory_cache.delete(key)
         self._db_cache.delete(key)
+        self._db_cache.commit()
 
 
 def canonical_arguments(args: Any) -> Any:
